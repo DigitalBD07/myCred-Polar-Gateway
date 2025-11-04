@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: myCred Polar.sh Points Purchase nov4
- * Plugin URI: https://your-website.com
+ * Plugin Name: myCred Polar.sh Points Purchase
+ * Plugin URI: https://devbd.net
  * Description: Purchase myCred points via Polar.sh. Includes webhook verification (Svix / Standard Webhooks), server-side fallback credit on success, and transaction logging.
  * Version: 2.4.0
- * Author: Your Name
+ * Author: Tanvir Haider
  * License: GPL-2.0-or-later
  * Text Domain: mycred-polar
  * Requires Plugins: mycred
@@ -763,4 +763,5 @@ function mycred_polar_settings_link($links) {
     array_unshift($links, $settings_link);
     return $links;
 }
+
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'mycred_polar_settings_link');
