@@ -1,0 +1,56 @@
+/**
+ * Admin Styles
+ */
+
+.mp-sub-table th,
+.mp-sub-table td {
+    padding: 6px;
+}
+
+.mp-sub-table input[type="text"],
+.mp-sub-table input[type="number"] {
+    width: 100%;
+}
+
+textarea#mp-plans-json {
+    width: 100%;
+    height: 120px;
+    font-family: monospace;
+}
+
+.mp-sub-del {
+    color: #b32d2e;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.mp-sub-del:hover {
+    color: #dc3232;
+}
+
+#mp-test-result,
+#mp-sync-result {
+    margin-top: 10px;
+}
+
+.mycred-polar-kpi-card {
+    flex: 1;
+    min-width: 260px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.mycred-polar-kpi-card h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.mycred-polar-kpi-card ul {
+    margin: 0;
+    padding-left: 16px;
+    line-height: 1.6;
+}

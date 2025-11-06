@@ -1,0 +1,66 @@
+/**
+ * Frontend Form Styles
+ */
+
+#mycred-polar-form-wrapper {
+    max-width: 920px;
+    padding: 20px;
+    border: 2px solid #0073aa;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+#mycred-polar-form-wrapper h3 {
+    margin-top: 0;
+}
+
+#mycred-polar-form-wrapper .polar-form-section {
+    flex: 1;
+    min-width: 280px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#mycred-polar-form-wrapper input[type="number"],
+#mycred-polar-form-wrapper select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#mycred-polar-form-wrapper .button-primary {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#mycred-polar-form-wrapper .price-display {
+    background: #0073aa;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+#mycred-polar-form-wrapper .error-message {
+    color: #d63638;
+    display: none;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+#mycred-polar-form-wrapper .loading-message {
+    display: none;
+    margin-top: 8px;
+}
+
+#mp-sub-list > div {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+}
