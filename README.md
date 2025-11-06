@@ -1,359 +1,363 @@
-# myCred Polar.sh Points & Subscriptions
+# myCred Polar.sh Integration
 
-Purchase myCred points or sell recurring subscriptions with Polar.sh — fully verified webhooks, idempotent crediting, a customer self‑serve cancel flow, and an admin “Subscribe” dashboard for MRR/ARR and subscriber insights.
+![Version](https://img.shields.io/badge/version-3.5.2-blue.svg)
+![WordPress](https://img.shields.io/badge/WordPress-5.0%2B-brightgreen.svg)
+![PHP](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)
+![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)
 
-- WordPress plugin
-- Version: 3.5.0
-- License: GPL-2.0-or-later
-- Requires: WordPress 5.8+, PHP 7.4+, myCred (free/core)
-- Polar features: Live/Sandbox, PWYW and fixed pricing, Customer Portal cancel, Subscriptions sync
+> Seamlessly integrate Polar.sh payment processing with myCred points system. Support one-time purchases and recurring subscriptions with PWYW (Pay What You Want) functionality.
 
-> If you’re here from the GitHub release: the plugin file is a single PHP file. Copy it to wp-content/plugins/mycred-polar-points/mycred-polar-plugin.php and activate.
+## 📸 Screenshots
 
----
+![myCred Polar Interface](screenshot.png)
 
-## Table of contents
+## ✨ Features
 
-- Features
-- Screenshots
-- Requirements
-- Installation
-- Quick start
-- Configuration (Polar + WordPress)
-- Shortcode
-- Admin pages
-- Webhooks and security
-- Subscriptions dashboard (Subscribe page)
-- Cancel flow
-- Database schema
-- WP actions and endpoints
-- Troubleshooting
-- FAQ
-- Changelog
-- Contributing
-- License
+- 🛒 **One-time Point Purchases** - Buy points instantly with Polar.sh checkout
+- 🔁 **Recurring Subscriptions** - Set up automatic point delivery cycles
+- 💰 **PWYW Support** - Pay What You Want with automatic point recalculation
+- 🎯 **Idempotent Point Awarding** - Prevents duplicate point awards
+- 🔐 **Robust Webhook Verification** - Svix/whsec_ signature validation
+- 👥 **Customer Portal Integration** - Users can manage subscriptions
+- 📊 **Admin Dashboard** - View MRR, ARR, and subscription KPIs
+- 📥 **CSV Export** - Download subscription data
+- 🔄 **Subscription Sync** - Manual sync with Polar.sh API
+- 🎨 **Modern Dark UI** - Beautiful, responsive interface
+- 🌐 **Sandbox & Live Modes** - Test before going live
+- 📝 **Transaction Logs** - Complete audit trail
 
----
+## 🚀 Installation
 
-## Features
+### Requirements
 
-- One‑time points purchase (PWYW or fixed product)
-- Recurring subscriptions for automatic points (per cycle)
-- Robust webhook verification (Svix/Polar Standard Webhooks)
-  - Modes: strict, api_fallback, disabled (dev)
-- Idempotent awarding (safe against retries)
-- Transaction logs (last 100)
-- Success page fallback credits (in case webhook is delayed)
-- Subscription list for end users + cancel at period end
-- Admin Subscribe dashboard:
-  - KPIs (Active, Canceling, Canceled last 30 days, MRR/ARR)
-  - Latest subscriptions table
-  - “Sync from Polar” (active + canceled) and CSV export
-- Live/Sandbox support and test connection
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+- [myCred](https://wordpress.org/plugins/mycred/) plugin installed and activated
+- Polar.sh account (Sandbox or Live)
 
----
+### Steps
 
-## Screenshots
+1. **Download the plugin**
+   ```bash
+   git clone https://github.com/yourusername/mycred-polar-sh.git
+   cd mycred-polar-sh
+   ```
 
-Add these after you install:
+2. **Upload to WordPress**
+   - Upload the `mycred-polar-sh` folder to `/wp-content/plugins/`
+   - Or upload the zip file via WordPress Admin → Plugins → Add New
 
-- docs/img/settings.png — Plugin settings
-- docs/img/shortcode.png — Front‑end purchase/subscription form
-- docs/img/subscribe-dashboard.png — Admin Subscribe dashboard
+3. **Activate**
+   - Go to WordPress Admin → Plugins
+   - Find "myCred Polar.sh Points & Subscriptions"
+   - Click "Activate"
 
-You can use placeholders and replace later:
+4. **Configure**
+   - Go to **myCred Polar.sh → Settings**
+   - Add your Polar.sh API credentials
+   - Set exchange rate and product IDs
+   - Configure webhook secret
 
-/docs/img/settings.png /docs/img/shortcode.png /docs/img/subscribe-dashboard.png
+## ⚙️ Configuration
 
-text
+### 1. Polar.sh Setup
 
+#### Create Access Token
+1. Go to [Polar.sh Settings → API](https://polar.sh/settings/api)
+2. Create a new token with these scopes:
+   - ✅ `products:read`
+   - ✅ `checkouts:write`
+   - ✅ `orders:read`
+   - ✅ `subscriptions:read`
+   - ✅ `customer_sessions:write`
+   - ✅ `subscriptions:write`
 
----
+#### Create Products
+1. **One-time Product**: For single point purchases (can be PWYW)
+2. **Recurring Products**: For subscription plans
 
-## Requirements
+#### Setup Webhook
+1. Go to Polar.sh → Webhooks
+2. Create webhook:
+   - **Event**: `order.paid`
+   - **Endpoint**: `https://yoursite.com/wp-json/mycred-polar/v1/webhook`
+   - **Secret**: Generate and copy to plugin settings
 
-- WordPress 5.8+
-- PHP 7.4+ (8.x supported)
-- myCred plugin active
-- Polar organization access token with scopes:
-  - products:read
-  - checkouts:write
-  - orders:read
-  - subscriptions:read
-  - customer_sessions:write
-  - subscriptions:write
+### 2. Plugin Settings
 
----
+Navigate to **myCred Polar.sh → Settings**:
 
-## Installation
+| Setting | Description | Example |
+|---------|-------------|---------|
+| Payment Mode | Sandbox or Live | `Sandbox` |
+| Access Token | Your Polar API token | `polar_at_...` |
+| Product ID | One-time product ID | `prod_...` |
+| Exchange Rate | $ per point | `0.10` (10¢/point) |
+| Min Points | Minimum purchase | `50` |
+| Default Points | Pre-filled amount | `100` |
+| Point Type | myCred point type | `mycred_default` |
+| Webhook Secret | From Polar webhook | `whsec_...` |
+| Webhook Verify | Verification mode | `Strict` |
 
-1) Create the folder:
+### 3. Subscription Plans
 
-wp-content/plugins/mycred-polar-points/
+Add recurring plans in settings:
 
-text
+```
+Name: Daily Plan
+Product ID: prod_xyz123
+Points per Cycle: 2000
+Use Custom Amount: ✓ (for PWYW)
+```
 
+## 📖 Usage
 
-2) Copy the plugin file (from this repo) to:
+### Display Purchase Form
 
-wp-content/plugins/mycred-polar-points/mycred-polar-plugin.php
+Add shortcode to any page or post:
 
-text
-
-
-3) Activate “myCred Polar.sh Points & Subscriptions NoV_8” in WordPress > Plugins.
-
-4) Visit Settings > myCred Polar.sh to configure.
-
----
-
-## Quick start
-
-1) In Polar:
-   - Create a one‑time product (PWYW or fixed).
-   - Create recurring products for plans.
-   - Create an Access Token (see scopes above).
-   - Create a Standard Webhook with event “order.paid”.
-     - Endpoint: your-site-url/wp-json/mycred-polar/v1/webhook
-     - Format: Raw
-     - Copy the Secret to plugin settings.
-
-2) In WordPress (Settings > myCred Polar.sh):
-   - Mode: Sandbox or Live
-   - Paste the Polar access token
-   - Paste product ids (one‑time, and define recurring plans)
-   - Paste webhook secret
-   - Save
-
-3) Add the shortcode to any page:
-
+```
 [mycred_polar_form]
+```
 
-text
+This displays:
+- One-time purchase card
+- Subscription plans selector
+- Subscription management panel
 
+### Admin Features
 
-4) Use the “Test Connection” button to confirm API access.
+#### View Transactions
+**myCred Polar.sh → Transaction Logs**
+- See all point purchases
+- Filter by user, status, date
+- View order details
+
+#### Subscription Dashboard
+**myCred Polar.sh → Subscribe**
+- View MRR (Monthly Recurring Revenue)
+- View ARR (Annual Recurring Revenue)
+- Active subscriber count
+- Recent cancellations
+- Sync with Polar.sh
+- Export to CSV
+
+## 🔧 Developer Guide
+
+### File Structure
+
+```
+mycred-polar-sh/
+├── mycred-polar.php                    # Main plugin file
+├── includes/
+│   ├── helpers.php                     # Utility functions
+│   ├── class-mycred-polar-core.php     # Core initialization
+│   ├── class-mycred-polar-database.php # Database operations
+│   ├── class-mycred-polar-webhook.php  # Webhook handler
+│   ├── class-mycred-polar-ajax.php     # AJAX endpoints
+│   └── class-mycred-polar-admin.php    # Admin interface
+├── admin/
+│   └── views/
+│       ├── settings-page.php           # Settings UI
+│       ├── logs-page.php               # Transaction logs UI
+│       └── subscribe-page.php          # Dashboard UI
+└── public/
+    ├── class-mycred-polar-shortcode.php # Shortcode handler
+    └── shortcode-form.php               # Frontend template
+```
+
+### Hooks & Filters
+
+#### Actions
+
+```php
+// Before point award
+do_action('mycred_polar_before_award', $user_id, $points, $order_id);
+
+// After point award
+do_action('mycred_polar_after_award', $user_id, $points, $order_id);
+
+// Webhook received
+do_action('mycred_polar_webhook_received', $event_type, $order_data);
+```
+
+#### Filters
+
+```php
+// Modify exchange rate
+add_filter('mycred_polar_exchange_rate', function($rate) {
+    return $rate * 0.9; // 10% discount
+});
+
+// Modify points calculation
+add_filter('mycred_polar_calculate_points', function($points, $amount) {
+    return $points + 10; // Bonus points
+}, 10, 2);
+
+// Customize log entry
+add_filter('mycred_polar_log_entry', function($entry, $order_id) {
+    return "Premium purchase - " . $entry;
+}, 10, 2);
+```
+
+### Custom Templates
+
+Override the frontend form:
+
+1. Copy `public/shortcode-form.php`
+2. Place in your theme: `your-theme/mycred-polar/shortcode-form.php`
+3. Customize as needed
+
+## 🔐 Security Features
+
+- ✅ **Webhook Signature Verification** - Svix standard HMAC validation
+- ✅ **Nonce Protection** - WordPress nonce on all AJAX calls
+- ✅ **Capability Checks** - Admin functions require `manage_options`
+- ✅ **SQL Injection Prevention** - Prepared statements with `$wpdb`
+- ✅ **XSS Protection** - All outputs escaped with `esc_html()`, `esc_attr()`
+- ✅ **CSRF Protection** - WordPress nonce validation
+- ✅ **Idempotent Awards** - Prevents duplicate point awards
+- ✅ **Rate Limiting** - Transient-based locking mechanism
+
+## 🐛 Troubleshooting
+
+### Points Not Awarded
+
+1. **Check webhook logs** in Polar.sh dashboard
+2. **Verify webhook secret** matches plugin settings
+3. **Test webhook** in Polar.sh → Send test event
+4. **Check WordPress debug log** for errors
+5. **Verify webhook endpoint** is accessible (not blocked by firewall)
+
+### Connection Issues
+
+1. **Test Connection** button in settings
+2. Verify API token has all required scopes
+3. Check if Sandbox/Live mode matches token type
+4. Ensure WordPress can make external HTTPS requests
+
+### Subscription Not Loading
+
+1. Click **Sync from Polar** in Subscribe dashboard
+2. Verify customer email is not demo/test/example domain
+3. Check if `external_customer_id` matches WordPress user ID
+4. Review subscription metadata in Polar.sh
+
+### PWYW Not Calculating
+
+1. Ensure `is_pwyw` flag is set in product metadata
+2. Check exchange rate is set correctly
+3. Verify webhook is receiving `net_amount` or `amount`
+4. Review transaction logs for calculation details
+
+## 📊 Database Tables
+
+### `wp_mycred_polar_logs`
+
+Stores all transactions:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | bigint | Auto increment |
+| user_id | bigint | WordPress user ID |
+| order_id | varchar | Polar order ID |
+| points | int | Points awarded |
+| amount | int | Amount in cents |
+| status | varchar | success/failed |
+| webhook_data | longtext | Raw webhook JSON |
+| created_at | datetime | Timestamp |
+
+### `wp_mycred_polar_subscriptions`
+
+Caches subscription data:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | bigint | Auto increment |
+| user_id | bigint | WordPress user ID |
+| subscription_id | varchar | Polar subscription ID |
+| product_id | varchar | Polar product ID |
+| plan_name | varchar | Plan display name |
+| points_per_cycle | int | Points awarded per cycle |
+| amount | int | Amount in cents |
+| currency | varchar | Currency code |
+| recurring_interval | varchar | month/year/week/day |
+| recurring_interval_count | int | Interval multiplier |
+| status | varchar | active/canceled/past_due |
+| cancel_at_period_end | tinyint | 1 if canceling |
+| current_period_start | datetime | Current period start |
+| current_period_end | datetime | Current period end |
+| started_at | datetime | Subscription start |
+| canceled_at | datetime | Cancellation date |
+| ends_at | datetime | Final billing date |
+| ended_at | datetime | Termination date |
+| customer_email | varchar | Customer email |
+| customer_external_id | varchar | WordPress user ID |
+| updated_at | datetime | Last update |
+| created_at | datetime | Creation time |
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Coding Standards
+
+- Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/)
+- Use meaningful variable names
+- Comment complex logic
+- Test thoroughly in Sandbox mode
+
+## 📝 Changelog
+
+### Version 3.5.2 (2024-11-06)
+
+- ✨ Added modern dark UI design
+- 🎨 Improved subscription management interface
+- 🔧 Fixed plan selection value updates
+- 📊 Enhanced admin dashboard with KPIs
+- 🐛 Various bug fixes and improvements
+
+### Version 3.5.0
+
+- ✨ Added Customer Portal integration
+- 🔄 Implemented subscription cancellation
+- 📥 Added CSV export functionality
+- 🎯 PWYW recalculation support
+- 🔐 Enhanced webhook security
+
+### Version 3.0.0
+
+- 🚀 Complete plugin restructure
+- 📁 Multi-file architecture
+- 🎨 Separated views from logic
+- 🔧 Improved maintainability
+
+## 📄 License
+
+This plugin is licensed under the [GPL-2.0-or-later](https://www.gnu.org/licenses/gpl-2.0.html) license.
+
+## 🙏 Credits
+
+- **myCred** - Points management system
+- **Polar.sh** - Payment processing platform
+- **WordPress** - Content management system
+
+## 📧 Support
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/mycred-polar-sh/issues)
+- **Documentation**: [Wiki](https://github.com/yourusername/mycred-polar-sh/wiki)
+- **Email**: support@yoursite.com
+
+## 🌟 Show Your Support
+
+Give a ⭐️ if this plugin helped you!
 
 ---
 
-## Configuration
-
-- Mode
-  - Sandbox (sandbox-api) vs Live (api)
-- Access Tokens
-  - Enter the correct token for each mode
-- One‑time product ids
-  - PWYW or fixed. PWYW requires “amount” during checkout; the plugin sends it.
-- Exchange rate
-  - $ per point for PWYW math and plan display
-- myCred point type
-- Webhook
-  - Secret (from Polar’s Standard Webhooks / Svix)
-  - Verification mode: strict / api_fallback / disabled (dev)
-- Subscription plans
-  - JSON or table editor
-  - If “Use custom amount”, price is points_per_cycle × exchange_rate
-
----
-
-## Shortcode
-
-[mycred_polar_form]
-
-text
-
-
-Renders:
-- One‑time points UI
-- Subscription plan picker
-- Manage Subscriptions block (list + cancel)
-
-Requires user to be logged in.
-
----
-
-## Admin pages
-
-- Settings > myCred Polar.sh
-  - Main configuration
-  - Test connection
-- myCred Polar.sh > Transaction Logs
-  - Last 100 transactions (date, user, points, amount, order id, status)
-- myCred Polar.sh > Subscribe (dashboard)
-  - KPIs per currency: Active, Canceling, Canceled (30d), MRR, ARR
-  - Latest 500 subscriptions table (user, email, plan, amount, interval, status, started, current period, renews, cancel/ended)
-  - Buttons: “Sync from Polar” and “Export CSV”
-
----
-
-## Webhooks and security
-
-- Endpoint:
-  - POST /wp-json/mycred-polar/v1/webhook
-- Event handled: order.paid
-- Signature verify: Svix-compatible (webhook-id, webhook-timestamp, webhook-signature variants)
-- Modes:
-  - strict: reject if signature invalid or missing
-  - api_fallback: if signature fails, plugin fetches order via Polar API and verifies paid
-  - disabled: dev only; verifies via API only
-
-Idempotency:
-- Each order id is granted at most once (transaction table lock + prior log check)
-
----
-
-## Subscriptions dashboard (Subscribe page)
-
-At a glance:
-- Active subscribers
-- Canceling (cancel_at_period_end)
-- Canceled or ended in last 30 days
-- MRR and ARR per currency
-
-Data sources:
-- Local cache table (synced from Polar)
-- “Sync from Polar” pulls:
-  - GET /v1/subscriptions?active=true
-  - GET /v1/subscriptions?active=false
-- CSV export of entire cache
-
-MRR normalization per subscription:
-- month: amount / interval_count
-- year: amount / 12 / interval_count
-- week: amount × (52/12) / interval_count
-- day: amount × (365/12) / interval_count
-
----
-
-## Cancel flow (end users)
-
-In the shortcode’s “Manage Subscriptions”:
-1) Validate ownership of subscription (metadata.user_id or customer.external_id)
-2) Create Polar Customer Session:
-   - POST /v1/customer-sessions (requires customer_sessions:write)
-3) Customer Portal cancel:
-   - DELETE /v1/customer-portal/subscriptions/{id}
-4) Fallback (org token):
-   - PATCH /v1/subscriptions/{id} {"cancel_at_period_end": true} (requires subscriptions:write)
-
-Cache is updated after successful cancel.
-
----
-
-## Database schema
-
-Two custom tables (with your WP prefix):
-
-1) {prefix}mycred_polar_logs
-- id, user_id, order_id, points, amount (cents), status, webhook_data, created_at
-
-2) {prefix}mycred_polar_subscriptions
-- id, user_id, subscription_id (unique), product_id, plan_name
-- points_per_cycle, amount (cents), currency
-- recurring_interval, recurring_interval_count
-- status, cancel_at_period_end
-- current_period_start, current_period_end
-- started_at, canceled_at, ends_at, ended_at
-- customer_email, customer_external_id
-- updated_at, created_at
-
-The plugin auto‑migrates schema (ALTER TABLE add missing columns) on load.
-
----
-
-## WP actions, AJAX and routes
-
-Shortcode:
-- [mycred_polar_form]
-
-REST (webhook):
-- POST /wp-json/mycred-polar/v1/webhook (order.paid)
-
-Rewrite:
-- /mycred-success → success page (credit fallback)
-
-AJAX (front):
-- mycred_polar_create_checkout
-- mycred_polar_create_subscription_checkout
-- mycred_polar_list_subscriptions
-- mycred_polar_cancel_subscription
-
-AJAX (admin):
-- mycred_polar_test_connection
-- mycred_polar_admin_sync_subscriptions
-
-Admin POST:
-- mycred_polar_export_subscriptions (CSV)
-
----
-
-## Troubleshooting
-
-- “Cancel failed: Unknown error”
-  - Ensure the plugin is on v3.5.0 or later.
-  - Check token scopes include customer_sessions:write and subscriptions:write.
-  - See browser console/Network → AJAX JSON will now include HTTP code and Polar error message for clarity.
-
-- Webhook not triggering points
-  - Verify event type is order.paid and Format is Raw.
-  - Check verification mode: if strict, ensure the secret matches.
-  - Use success fallback by completing checkout and hitting the success page (the plugin tries a few times to fetch the order and credit).
-
-- Subscribe page shows blanks/warnings
-  - v3.5.0 includes schema migration and null‑safe rendering.
-  - Click “Sync from Polar” to populate full rows.
-
----
-
-## FAQ
-
-- Does PWYW work?
-  - Yes. The plugin calculates amount = points × exchange_rate and passes it to Polar.
-
-- Can users manage subscriptions?
-  - The UI lists a user’s active subscriptions and allows cancel at period end.
-
-- Multiple currencies?
-  - KPIs are grouped per currency. Consolidated USD view can be added if you want (FX rates required).
-
-- Can I auto‑sync nightly?
-  - Not yet. Open an issue/PR — happy to add a WP-Cron daily sync.
-
----
-
-## Changelog
-
-- 3.5.0
-  - New Subscribe dashboard (KPIs, table, Sync, CSV)
-  - Defensive rendering + auto schema migration
-  - Hardened cancel flow + clearer errors
-- 3.4.x
-  - Added admin dashboard foundation and cancel fixes
-- 3.3.x
-  - Fixed AJAX cancel hook and fallback PATCH
-- 3.2.x
-  - Base implementation: one‑time, subscriptions, webhook crediting, logs, success fallback
-
-See commit history for details.
-
----
-
-## Contributing
-
-- Fork the repo
-- Create a feature branch: `feat/your-idea`
-- Follow WP PHPCS where possible
-- Open a PR with a clear description and testing notes
-
-Issues / Ideas welcome — especially:
-- Daily/weekly auto‑sync
-- Multi‑currency consolidation
-- Cohort/churn analytics on the Subscribe dashboard
-
----
-
-## License
-
-GPL-2.0-or-later
-
-Copyright (c) 2025
+Made with ❤️ for the WordPress community
