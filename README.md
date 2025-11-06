@@ -352,7 +352,7 @@ This plugin is licensed under the [GPL-2.0-or-later](https://www.gnu.org/license
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/mycred-polar-sh/issues)
 - **Documentation**: [Wiki](https://github.com/yourusername/mycred-polar-sh/wiki)
-- **Email**: support@yoursite.com
+- **Email**: info4bd@gmail.com
 
 ## 🌟 Show Your Support
 
